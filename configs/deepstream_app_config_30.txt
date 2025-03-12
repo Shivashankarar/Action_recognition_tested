@@ -1,0 +1,204 @@
+[application]
+enable-perf-measurement=1
+perf-measurement-interval-sec=5
+
+[tiled-display]
+enable=0
+rows=1
+columns=1
+width=1280
+height=720
+gpu-id=0
+nvbuf-memory-type=0
+
+[source0]
+enable = 1
+type = 3
+uri = file://DOWNLOAD_31122024_075748_C6.AVI
+#uri=rtsp://172.16.11.91:8554/test
+num-sources = 1
+gpu-id = 0
+rtsp-reconnect-attempts = 10000
+rtsp-reconnect-interval-sec = 600
+cudadec-memtype = 0
+
+[sink0]
+enable=0
+type=1
+sync=0
+gpu-id=0
+nvbuf-memory-type=0
+
+[sink1]
+enable=1
+type=2
+#1=mp4 2=mkv
+container=2
+#1=h264 2=h265 3=mpeg4
+## only SW mpeg4 is supported right now.
+codec=1
+sync=0
+bitrate=4000000
+#output-file=idle_DOWNLOAD_03022025_102509_C6_03_03_25.mp4
+#source-id=0
+
+[sink2]
+enable=0
+#Type - 1=FakeSink 2=EglSink 3=File 4=UDPSink 5=nvoverlaysink 6=MsgConvBroker
+type=6
+msg-conv-config=action_msgconv_config.txt
+#(0): PAYLOAD_DEEPSTREAM - Deepstream schema payload
+#(1): PAYLOAD_DEEPSTREAM_MINIMAL - Deepstream schema payload minimal
+#(256): PAYLOAD_RESERVED - Reserved type
+#(257): PAYLOAD_CUSTOM   - Custom schema payload
+msg-conv-payload-type=1
+#(0): Create payload using NvdsEventMsgMeta
+#(1): New Api to create payload using NvDsFrameMeta
+msg-conv-msg2p-new-api=1
+#Frame interval at which payload is generated
+msg-conv-frame-interval=0
+msg-broker-proto-lib=/opt/nvidia/deepstream/deepstream-6.3/lib/libnvds_kafka_proto.so
+#Provide your msg-broker-conn-str here
+msg-broker-conn-str=localhost;9092;ds-action
+topic=dsaction-cal
+#Optional:
+#msg-broker-config=/opt/nvidia/deepstream/deepstream-6.3/sources/libs/kafka_protocol_adaptor/cfg_kafka.txt
+#new-api=0
+#(0) Use message adapter library api's
+#(1) Use new msgbroker library api's
+[sink3]
+enable=0
+#Type - 1=FakeSink 2=EglSink 3=File 4=RTSPStreaming
+type=4
+#1=h264 2=h265
+codec=1
+#encoder type 0=Hardware 1=Software
+enc-type=0
+sync=0
+bitrate=4000000
+#H264 Profile - 0=Baseline 2=Main 4=High
+#H265 Profile - 0=Main 1=Main10
+# set profile only for hw encoder, sw encoder selects profile based on sw-preset
+profile=0
+# set below properties in case of RTSPStreaming
+rtsp-port=8554
+udp-port=5400
+
+[message-broker]
+proto-cfg="message.timeout.ms=2000;retries=5"
+consumer-group-id = groupid
+partition-key = keyid
+
+
+[osd]
+enable=1
+gpu-id=0
+border-width=1
+text-size=15
+text-color=1;1;1;1;
+text-bg-color=0.3;0.3;0.3;1
+font=Serif
+show-clock=0
+clock-x-offset=800
+clock-y-offset=820
+clock-text-size=12
+clock-color=1;0;0;0
+nvbuf-memory-type=0
+
+[streammux]
+gpu-id=0
+live-source=1
+batch-size=2
+batched-push-timeout=40000
+width=1920
+height=1080
+enable-padding=0
+nvbuf-memory-type=0
+attach-sys-ts-as-ntp=1
+
+[pre-process]
+enable=1
+config-file=config_preprocess_3d_custom.txt
+
+
+[primary-gie]
+enable=1
+gpu-id=0
+gie-unique-id=1
+nvbuf-memory-type=0
+input-tensor-meta=1
+config-file=config_infer_primary_3d_action.txt
+
+[secondary-gie0]
+# PERSON
+enable=0
+#model-engine-file=hopper.onnx_b8_gpu0_fp16.engine
+gpu-id=0
+batch-size=8
+gie-unique-id=2
+classifier-async-mode=0
+operate-on-gie-id=1
+operate-on-class-ids=2;3;4;6
+config-file=config_infer_secondary_material.txt
+
+[secondary-gie1]
+# Panel
+enable=0
+model-engine-file=panel_v2.etlt_b4_gpu0_fp16.engine
+gpu-id=0
+batch-size=4
+gie-unique-id=3
+classifier-async-mode=0
+operate-on-gie-id=1
+operate-on-class-ids=10;11
+config-file=config_infer_secondary_panel.txt
+
+[secondary-gie2]
+# Valve
+enable=0
+model-engine-file=valve_v2.etlt_b4_gpu0_fp16.engine
+gpu-id=0
+batch-size=4
+gie-unique-id=4
+classifier-async-mode=0
+operate-on-gie-id=1
+operate-on-class-ids=7
+config-file=config_infer_secondary_valve.txt
+
+[secondary-gie3]
+# Valve
+enable=0
+model-engine-file=mixer.etlt_b4_gpu0_fp16.engine
+gpu-id=0
+batch-size=4
+gie-unique-id=5
+classifier-async-mode=0
+operate-on-gie-id=1
+operate-on-class-ids=5
+config-file=config_infer_secondary_mixer.txt
+
+
+[tracker]
+enable=0
+# For NvDCF and DeepSORT tracker, tracker-width and tracker-height must be a multiple of 32, respectively
+tracker-width=640
+tracker-height=384
+ll-lib-file=/opt/nvidia/deepstream/deepstream-7.1/lib/libnvds_nvmultiobjecttracker.so
+# ll-config-file required to set different tracker types
+# ll-config-file=../../samples/configs/deepstream-app/config_tracker_IOU.yml
+#ll-config-file=../../samples/configs/deepstream-app/config_tracker_NvDCF_perf.yml
+# ll-config-file=../../samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+#ll-config-file=/opt/nvidia/deepstream/deepstream/samples/configs/deepstream-app/config_tracker_NvDCF_accuracy.yml
+gpu-id=0
+enable-batch-process=1
+enable-past-frame=1
+display-tracking-id=1
+
+[nvds-analytics]
+enable=1
+config-file=hdp_analytics.txt
+
+
+[tests]
+file-loop=1
+
