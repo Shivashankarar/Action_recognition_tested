@@ -5,10 +5,7 @@ Use Docker Image:
 sudo docker pull nvcr.io/nvidia/deepstream:6.4-triton-multiarch
 
 Steps : 
-First Make the deeepstream folder files for deepstream-test5-analytics
 
-then
-
-go to config
-
-run deepstream-test5-analytics -c deepstream_app_config_30.txt -t 
+- First Make the deeepstream folder files for deepstream-test5-analytics
+- Go to config
+- run deepstream-test5-analytics -c deepstream_app_config_30.txt -t 
