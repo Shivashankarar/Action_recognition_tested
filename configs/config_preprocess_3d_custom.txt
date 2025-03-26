@@ -79,7 +79,12 @@ subsample=1
 [group-0]
 src-ids=0;
 process-on-roi=1
+### For single roi 
+################   x1; y1; x2; y2 ---> x1 y1 width height  Top-left; Bottom-Right  
 roi-params-src-0=1028;332;608;608
+#### For Multi ROI
+################  ROI - 1      |    ROI  - 2  
+################ x1; y1; x2; y2; x1; y1 ; x2; y2 
 roi-params-src-0=78;498;680;576;842;416;388;326
 #roi-params-src-2=0;0;1280;720
 #roi-params-src-3=0;0;1280;720
